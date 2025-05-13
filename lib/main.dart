@@ -5,22 +5,31 @@ import 'package:itelec4c_final_project/pages/recipe/recipe_list_page.dart';
 
 void main() => runApp(MyApp());
 
+// class MyApp extends StatelessWidget {
+//   final Color darkYellow = Colors.amber[800]!;
+//   final Color lightYellow = Colors.amber[100]!;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Landing Page App',
+//       theme: ThemeData(primaryColor: darkYellow),
+//       home: LandingPage(),
+//       routes: {
+//         '/login': (_) => LoginPage(),
+//         '/signup': (_) => SignUpPage(),
+//         '/recipes': (_) => RecipeListPage(),
+//       },
+//     );
+//   }
+// }
+
 class MyApp extends StatelessWidget {
-  final Color darkYellow = Colors.amber[800]!;
-  final Color lightYellow = Colors.amber[100]!;
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Landing Page App',
-      theme: ThemeData(primaryColor: darkYellow),
-      home: LandingPage(),
-      routes: {
-        '/login': (_) => LoginPage(),
-        '/signup': (_) => SignUpPage(),
-        '/recipes': (_) => RecipeListPage(),
-      },
-    );
+    return MaterialApp(home: ProfilePage());
   }
 }
 
@@ -282,12 +291,6 @@ class SignUpPage extends StatelessWidget {
           ),
           Spacer(),
         ],
-      ),
-    );
-    return MaterialApp(
-      home: ProfilePage(
-        username: "Julia",
-        email: "maryjulia.malagayo.cics@ust.edu.ph",
       ),
     );
   }
