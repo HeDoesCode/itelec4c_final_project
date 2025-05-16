@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itelec4c_final_project/components/appbar.dart';
+import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/pages/profile/profile_update_page.dart';
 import 'dart:io';
 
@@ -28,10 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Profile"),
-        backgroundColor: Colors.orangeAccent,
-      ),
+      appBar: AuthAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itelec4c_final_project/components/appbar.dart';
+import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/components/recipe_featured_item.dart';
 import 'package:itelec4c_final_project/components/recipe_list_item.dart';
 
@@ -10,7 +10,7 @@ class RecipeListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(100, 255, 224, 178),
-      appBar: CustomAppBar(),
+      appBar: AuthAppBar(),
       body: Center(
         child: ListView(
           children: [
