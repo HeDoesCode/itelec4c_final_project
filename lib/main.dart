@@ -3,10 +3,20 @@ import 'package:itelec4c_final_project/pages/account/account_login_page.dart';
 import 'package:itelec4c_final_project/pages/account/account_signup_page.dart';
 import 'package:itelec4c_final_project/pages/landing_page.dart';
 
-void main() => runApp(MyApp());
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  runApp(Dishly());
+}
+
+class Dishly extends StatelessWidget {
+  const Dishly({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758311550466",
+    "project_id": "dishly-54fa6",
+    "storage_bucket": "dishly-54fa6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758311550466:android:9929698f11b0e51d9a711b",
+        "android_client_info": {
+          "package_name": "com.example.itelec4c_final_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPVOsbTQcglSUvHQqgRqHbTeKdfel4R0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
