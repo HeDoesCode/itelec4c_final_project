@@ -16,7 +16,7 @@ class RecipeDetailsPage extends StatelessWidget {
             RecipeDetailHeader(),
             Expanded(
               child: ListView(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(20),
                 children: [
                   Image(image: AssetImage('images/img_placeholder_rect.png')),
                   SizedBox(height: 20),
@@ -52,6 +52,13 @@ class ListBuilder extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.10),
+            blurRadius: 3,
+            offset: Offset(5, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +86,7 @@ class RecipeDetailHeader extends StatelessWidget {
       padding: EdgeInsets.all(10),
       child: Row(
         children: [
-          TransparentButton(iconLabel: Icons.arrow_back, action: () {}),
+          BackButton(),
           SizedBox(width: 10),
           Expanded(
             child: Text(
