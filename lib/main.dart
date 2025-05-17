@@ -4,7 +4,8 @@ import 'package:itelec4c_final_project/pages/account/account_signup_page.dart';
 import 'package:itelec4c_final_project/pages/landing_page.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:itelec4c_final_project/pages/recipe/recipe_home_page.dart';
+import 'package:itelec4c_final_project/pages/recipe/recipe_search_page.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -25,7 +26,8 @@ class Dishly extends StatelessWidget {
       routes: {
         '/login': (_) => LoginPage(),
         '/signup': (_) => SignUpPage(),
-        // '/recipes': (_) => RecipeListPage(),
+        '/reciple': (_) => RecipeHomePage(),
+        '/recipe/search': (_) => SearchPage(),
       },
     );
   }

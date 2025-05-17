@@ -55,6 +55,10 @@ class _SearchPageState extends State<SearchPage> {
                       return Center(child: CircularProgressIndicator());
                     }
 
+                    if (searchQuery.isEmpty) {
+                      return Container();
+                    }
+
                     if (searchQuery.isNotEmpty && snapshot.data?.size == 0) {
                       return Center(
                         child: Text(
@@ -71,12 +75,7 @@ class _SearchPageState extends State<SearchPage> {
                       itemBuilder: (context, index) {
                         var recipe = recipes[index];
 
-                        return RecipeListItem(
-                          name: recipe['title'],
-                          ingredients: "test",
-                          category: recipe['category'],
-                          time: recipe['cooking_time'].toString(),
-                        );
+                        return RecipeListItem(recipe: recipe);
                       },
                     );
                   },

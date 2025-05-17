@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/components/transparent_btn.dart';
 
 class RecipeDetailsPage extends StatelessWidget {
-  const RecipeDetailsPage({super.key});
+  final QueryDocumentSnapshot<Map<String, dynamic>> recipe;
+
+  const RecipeDetailsPage({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +16,7 @@ class RecipeDetailsPage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            RecipeDetailHeader(),
+            RecipeDetailHeader(title: recipe['title']),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.all(20),
@@ -21,13 +24,13 @@ class RecipeDetailsPage extends StatelessWidget {
                   Image(image: AssetImage('images/img_placeholder_rect.png')),
                   SizedBox(height: 20),
                   ListBuilder(
-                    title: "Ingredients",
-                    list: ["ingredient 1", "ingredient 2", "ingredient 3"],
+                    sectionTitle: "Ingredients",
+                    list: recipe['ingredients'],
                   ),
                   SizedBox(height: 20),
                   ListBuilder(
-                    title: "Procedure",
-                    list: ["Step 1", "Step 2", "Step 3", "step 4"],
+                    sectionTitle: "Procedure",
+                    list: recipe['instructions'],
                   ),
                 ],
               ),
@@ -40,10 +43,14 @@ class RecipeDetailsPage extends StatelessWidget {
 }
 
 class ListBuilder extends StatelessWidget {
-  final String title;
-  final List<String> list;
+  final String sectionTitle;
+  final List list;
 
-  const ListBuilder({super.key, required this.title, required this.list});
+  const ListBuilder({
+    super.key,
+    required this.sectionTitle,
+    required this.list,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,12 +71,15 @@ class ListBuilder extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            sectionTitle,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [for (String text in list) Text(text)],
+            children: [
+              for (int i = 0; i < list.length; i++)
+                Text("${i + 1}. ${list[i]}"),
+            ],
           ),
         ],
       ),
@@ -78,7 +88,9 @@ class ListBuilder extends StatelessWidget {
 }
 
 class RecipeDetailHeader extends StatelessWidget {
-  const RecipeDetailHeader({super.key});
+  final String title;
+
+  const RecipeDetailHeader({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +98,11 @@ class RecipeDetailHeader extends StatelessWidget {
       padding: EdgeInsets.all(10),
       child: Row(
         children: [
-          BackButton(),
-          SizedBox(width: 10),
           Expanded(
             child: Text(
-              "Title",
+              title,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+              overflow: TextOverflow.clip,
             ),
           ),
           TransparentButton(
