@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/guest_appbar.dart';
 
@@ -23,10 +26,28 @@ class _SignUpFormState extends State<SignUpForm> {
 
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
-  final _budgetController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  Future<void> _signUpUser() async {
+    String username = _usernameController.text.trim();
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+
+    User? user = userCredential.user;
+
+    String? uid = user?.uid;
+
+    await FirebaseFirestore.instance.collection('tbl_users').doc(uid).set({
+      'username': username,
+      'email': email,
+      'favorites': [],
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,17 +87,6 @@ class _SignUpFormState extends State<SignUpForm> {
                               (value) =>
                                   value == null || value.isEmpty
                                       ? 'Username is required'
-                                      : null,
-                        ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: _budgetController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(labelText: 'Budget'),
-                          validator:
-                              (value) =>
-                                  value == null || value.isEmpty
-                                      ? 'Budget is required'
                                       : null,
                         ),
                         SizedBox(height: 20),
@@ -135,9 +145,11 @@ class _SignUpFormState extends State<SignUpForm> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              // TO-DO: handle signup function
+                              await _signUpUser();
+
+                              Navigator.pop(context);
                             }
                           },
                           child: Text('Sign Up'),

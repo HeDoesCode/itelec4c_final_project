@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/guest_appbar.dart';
 
@@ -97,9 +98,14 @@ class _LoginFormState extends State<LoginForm> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    // TO-DO: handle login function
+                                    await FirebaseAuth.instance
+                                        .signInWithEmailAndPassword(
+                                          email: _emailController.text.trim(),
+                                          password:
+                                              _passwordController.text.trim(),
+                                        );
                                   }
                                 },
                                 child: Text('Log in'),
