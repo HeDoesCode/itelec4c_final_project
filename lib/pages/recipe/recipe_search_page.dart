@@ -194,9 +194,7 @@ class _SearchPageState extends State<SearchPage> {
                   return ListView.builder(
                     itemCount: recipes.length,
                     itemBuilder: (context, index) {
-                      var recipe =
-                          recipes[index]
-                              as QueryDocumentSnapshot<Map<String, dynamic>>;
+                      var recipe = recipes[index];
                       return RecipeListItem(recipe: recipe);
                     },
                   );

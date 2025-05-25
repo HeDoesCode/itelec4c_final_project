@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/components/transparent_btn.dart';
+import 'package:itelec4c_final_project/services/favorite_recipe_service.dart';
 
 class RecipeDetailsPage extends StatelessWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> recipe;
@@ -16,7 +17,7 @@ class RecipeDetailsPage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            RecipeDetailHeader(title: recipe['title']),
+            Header(recipe: recipe),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.all(20),
@@ -87,10 +88,42 @@ class ListBuilder extends StatelessWidget {
   }
 }
 
-class RecipeDetailHeader extends StatelessWidget {
-  final String title;
+class Header extends StatefulWidget {
+  final QueryDocumentSnapshot<Map<String, dynamic>> recipe;
 
-  const RecipeDetailHeader({super.key, required this.title});
+  const Header({super.key, required this.recipe});
+
+  @override
+  State<Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
+  final FavoriteRecipeService _favoriteRecipeService = FavoriteRecipeService();
+  bool isFav = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initialize();
+  }
+
+  void initialize() async {
+    List userFavorites = await _favoriteRecipeService.getUserFavorites();
+
+    setState(() {
+      isFav = userFavorites.contains(widget.recipe.id);
+    });
+  }
+
+  void handleFavoriteToggle() {
+    isFav
+        ? _favoriteRecipeService.removeFromFavorites(widget.recipe.id)
+        : _favoriteRecipeService.addToFavorites(widget.recipe.id);
+
+    setState(() {
+      isFav = !isFav;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,14 +133,14 @@ class RecipeDetailHeader extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              title,
+              widget.recipe['title'],
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
               overflow: TextOverflow.clip,
             ),
           ),
           TransparentButton(
-            iconLabel: Icons.bookmark_border_outlined,
-            action: () {},
+            iconLabel: isFav ? Icons.bookmark : Icons.bookmark_border_rounded,
+            action: handleFavoriteToggle,
           ),
         ],
       ),

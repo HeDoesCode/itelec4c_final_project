@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/components/recipe_list_item.dart';
+import 'package:itelec4c_final_project/pages/recipe/recipe_details_page.dart';
 
 class RecipeHomePage extends StatefulWidget {
   const RecipeHomePage({super.key});
@@ -54,9 +55,7 @@ class _RecipeHomePageState extends State<RecipeHomePage> {
                               itemBuilder: (context, index) {
                                 var recipe = featuredRecipes[index];
 
-                                return RecipeFeaturedItem(
-                                  title: recipe['title'],
-                                );
+                                return RecipeFeaturedItem(recipe: recipe);
                               },
                             );
                           },
@@ -121,30 +120,41 @@ class SectionHeader extends StatelessWidget {
 }
 
 class RecipeFeaturedItem extends StatelessWidget {
-  final String title;
+  final recipe;
 
-  const RecipeFeaturedItem({super.key, required this.title});
+  const RecipeFeaturedItem({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Stack(
-        children: [
-          Image(image: AssetImage('images/img_placeholder_rect.png')),
-          Positioned(
-            bottom: 0,
-            left: 5,
-            child: Text(
-              title,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecipeDetailsPage(recipe: recipe),
+          ),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        child: Stack(
+          children: [
+            Image(image: AssetImage('images/img_placeholder_rect.png')),
+            Positioned(
+              bottom: 0,
+              left: 5,
+              child: Text(
+                recipe['title'],
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

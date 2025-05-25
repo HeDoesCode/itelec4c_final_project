@@ -2,13 +2,46 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/transparent_btn.dart';
 import 'package:itelec4c_final_project/pages/recipe/recipe_details_page.dart';
+import 'package:itelec4c_final_project/services/favorite_recipe_service.dart';
 
-class RecipeListItem extends StatelessWidget {
+class RecipeListItem extends StatefulWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> recipe;
 
   const RecipeListItem({super.key, required this.recipe});
 
-  String buildIngredientString(List ingredients) {
+  @override
+  State<RecipeListItem> createState() => _RecipeListItemState();
+}
+
+class _RecipeListItemState extends State<RecipeListItem> {
+  final FavoriteRecipeService _favoriteRecipeService = FavoriteRecipeService();
+  bool isFav = false;
+
+  @override
+  void initState() {
+    super.initState();
+    initialize();
+  }
+
+  void initialize() async {
+    List userFavorites = await _favoriteRecipeService.getUserFavorites();
+
+    setState(() {
+      isFav = userFavorites.contains(widget.recipe.id);
+    });
+  }
+
+  void handleFavoriteToggle() {
+    isFav
+        ? _favoriteRecipeService.removeFromFavorites(widget.recipe.id)
+        : _favoriteRecipeService.addToFavorites(widget.recipe.id);
+
+    setState(() {
+      isFav = !isFav;
+    });
+  }
+
+  String buildPreviewIngredients(List ingredients) {
     return ingredients.join(', ');
   }
 
@@ -19,7 +52,7 @@ class RecipeListItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RecipeDetailsPage(recipe: recipe),
+            builder: (context) => RecipeDetailsPage(recipe: widget.recipe),
           ),
         );
       },
@@ -44,7 +77,7 @@ class RecipeListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        recipe['title'],
+                        widget.recipe['title'],
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -52,9 +85,7 @@ class RecipeListItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        recipe.data().containsKey('ingredients')
-                            ? buildIngredientString(recipe['ingredients'])
-                            : "No ingredients listed",
+                        buildPreviewIngredients(widget.recipe['ingredients']),
                         style: TextStyle(color: Colors.grey),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -66,7 +97,7 @@ class RecipeListItem extends StatelessWidget {
                         ),
                         padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                         child: Text(
-                          recipe['category'],
+                          widget.recipe['category'],
                           style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ),
@@ -76,7 +107,7 @@ class RecipeListItem extends StatelessWidget {
                           Icon(Icons.access_time_rounded, color: Colors.grey),
                           SizedBox(width: 5),
                           Text(
-                            "${recipe['cooking_time'].toString()} mins",
+                            "${widget.recipe['cooking_time'].toString()} mins",
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
@@ -90,8 +121,11 @@ class RecipeListItem extends StatelessWidget {
               bottom: 0,
               right: 5,
               child: TransparentButton(
-                iconLabel: Icons.bookmark_border_rounded,
-                action: () {},
+                iconLabel:
+                    isFav
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
+                action: handleFavoriteToggle,
               ),
             ),
           ],
