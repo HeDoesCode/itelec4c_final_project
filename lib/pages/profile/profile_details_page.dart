@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/pages/profile/profile_update_page.dart';
 import 'dart:io';
+import 'package:itelec4c_final_project/components/bottom_appbar.dart'; // Import BottomNavBar
+import 'package:itelec4c_final_project/pages/recipe/recipe_home_page.dart';
+import 'package:itelec4c_final_project/pages/recipe/recipe_favorite_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,6 +18,23 @@ class _ProfilePageState extends State<ProfilePage> {
   String _email = 'maryjulia.malagayo.cics@ust.edu.ph';
   String _budget = '₱1000';
   File? _profileImage;
+
+  // Navigation state
+  int _selectedIndex = 2; // Set the initial page to Profile
+
+  // List of Pages to navigate to
+  final List<Widget> _pages = [
+    RecipeHomePage(), // Home Page
+    FavoritesPage(), // Favorites Page
+    ProfilePage(), // Profile Page
+  ];
+
+  // Handle navigation when tapping on a bottom navigation item
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   void _updateProfile(Map<String, dynamic> updatedProfile) {
     setState(() {
