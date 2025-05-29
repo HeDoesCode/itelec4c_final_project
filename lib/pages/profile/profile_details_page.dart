@@ -1,10 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/pages/profile/profile_update_page.dart';
-import 'dart:io';
-import 'package:itelec4c_final_project/components/bottom_appbar.dart'; // Import BottomNavBar
-import 'package:itelec4c_final_project/pages/recipe/recipe_home_page.dart';
-import 'package:itelec4c_final_project/pages/recipe/recipe_favorite_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,55 +12,41 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _username = 'Julia';
-  String _email = 'maryjulia.malagayo.cics@ust.edu.ph';
-  String _budget = '₱1000';
-  File? _profileImage;
+  String _username = "";
+  String _email = "";
 
-  // Navigation state
-  int _selectedIndex = 2; // Set the initial page to Profile
-
-  // List of Pages to navigate to
-  final List<Widget> _pages = [
-    RecipeHomePage(), // Home Page
-    FavoritesPage(), // Favorites Page
-    ProfilePage(), // Profile Page
-  ];
-
-  // Handle navigation when tapping on a bottom navigation item
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _getUserDetails();
   }
 
-  void _updateProfile(Map<String, dynamic> updatedProfile) {
+  Future _getUserDetails() async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    await currentUser?.reload();
+    currentUser = FirebaseAuth.instance.currentUser;
+
+    var user =
+        await FirebaseFirestore.instance
+            .collection('tbl_users')
+            .doc(currentUser!.uid)
+            .get();
+
     setState(() {
-      _username = updatedProfile['username'];
-      _email = updatedProfile['email'];
-      _budget = updatedProfile['budget'];
-      _profileImage = updatedProfile['profileImage'];
+      _username = user['username'];
+      _email = currentUser!.email ?? '';
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(100, 255, 224, 178),
       appBar: AuthAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.grey[300],
-              backgroundImage:
-                  _profileImage != null ? FileImage(_profileImage!) : null,
-              child:
-                  _profileImage == null
-                      ? Icon(Icons.camera_alt, size: 40, color: Colors.white)
-                      : null,
-            ),
             SizedBox(height: 20),
             Text(
               'Hello, $_username!',
@@ -86,39 +70,48 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     InfoRow(label: 'Username', value: _username),
                     InfoRow(label: 'Email', value: _email),
-                    InfoRow(label: 'Budget', value: _budget),
                   ],
                 ),
               ),
             ),
             Spacer(),
-            ElevatedButton(
-              onPressed: () async {
-                final updatedProfile = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => ProfileUpdatePage(
-                          username: _username,
-                          email: _email,
-                          budget: _budget,
-                          profileImage: _profileImage,
-                        ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfileUpdatePage(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                    textStyle: TextStyle(fontSize: 16),
                   ),
-                );
-                if (updatedProfile != null) {
-                  _updateProfile(updatedProfile);
-                }
-              },
-              child: Text('Edit Profile'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orangeAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  child: Text('Edit Profile'),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-                textStyle: TextStyle(fontSize: 16),
-              ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                    textStyle: TextStyle(fontSize: 16),
+                  ),
+                  child: Text('Logout'),
+                ),
+              ],
             ),
           ],
         ),

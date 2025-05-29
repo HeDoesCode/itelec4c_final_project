@@ -1,20 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class ProfileUpdatePage extends StatefulWidget {
-  final String username;
-  final String email;
-  final String budget;
-  final File? profileImage;
-
-  const ProfileUpdatePage({
-    super.key,
-    required this.username,
-    required this.email,
-    required this.budget,
-    this.profileImage,
-  });
+  const ProfileUpdatePage({super.key});
 
   @override
   _ProfileUpdatePageState createState() => _ProfileUpdatePageState();
@@ -24,34 +13,37 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController budgetController = TextEditingController();
-  File? _profileImage;
+
+  User? currentUser;
+  var user;
 
   @override
   void initState() {
     super.initState();
-    usernameController.text = widget.username;
-    emailController.text = widget.email;
-    budgetController.text = widget.budget;
-    _profileImage = widget.profileImage; // Set the initial image
+    _getUserDetails();
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
+  Future _getUserDetails() async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    await currentUser?.reload();
+    currentUser = FirebaseAuth.instance.currentUser;
 
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
-    }
+    var user =
+        await FirebaseFirestore.instance
+            .collection('tbl_users')
+            .doc(currentUser!.uid)
+            .get();
+
+    setState(() {
+      usernameController.text = user['username'];
+      emailController.text = currentUser?.email as String;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(100, 255, 224, 178),
       appBar: AppBar(
         title: Text("Edit Profile"),
         backgroundColor: Colors.orangeAccent,
@@ -62,26 +54,9 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           key: _formKey,
           child: Column(
             children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage:
-                      _profileImage != null ? FileImage(_profileImage!) : null,
-                  child:
-                      _profileImage == null
-                          ? Icon(
-                            Icons.camera_alt,
-                            size: 40,
-                            color: Colors.white,
-                          )
-                          : null,
-                ),
-              ),
               SizedBox(height: 20),
               Text(
-                'Edit your profile, ${usernameController.text}',
+                'Edit your profile',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -122,35 +97,29 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         },
                       ),
                       SizedBox(height: 10),
-                      TextFormField(
-                        controller: budgetController,
-                        decoration: InputDecoration(labelText: 'Budget'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Budget is required';
-                          }
-                          return null;
-                        },
-                      ),
                     ],
                   ),
                 ),
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
-                    final updatedProfile = {
-                      'username': usernameController.text,
-                      'email': emailController.text,
-                      'budget': budgetController.text,
-                      'profileImage': _profileImage, // Return the new image
-                    };
-                    // Return the updated profile back to the ProfilePage
-                    Navigator.pop(context, updatedProfile);
+                    await currentUser?.verifyBeforeUpdateEmail(
+                      emailController.text.trim(),
+                    );
+
+                    await currentUser?.reload();
+                    currentUser = FirebaseAuth.instance.currentUser;
+
+                    await FirebaseFirestore.instance
+                        .collection('tbl_users')
+                        .doc(currentUser?.uid)
+                        .update({'userrome': usernameController.text.trim()});
+
+                    Navigator.pop(context);
                   }
                 },
-                child: Text('Save Changes'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orangeAccent,
                   shape: RoundedRectangleBorder(
@@ -159,6 +128,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                   padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                   textStyle: TextStyle(fontSize: 16),
                 ),
+                child: Text('Save Changes'),
               ),
             ],
           ),

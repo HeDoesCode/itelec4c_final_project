@@ -1,7 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/pages/account/account_login_page.dart';
 import 'package:itelec4c_final_project/pages/account/account_signup_page.dart';
-import 'package:itelec4c_final_project/pages/auth_handler_page.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:itelec4c_final_project/pages/recipe/recipe_home_page.dart';
@@ -24,15 +24,24 @@ class Dishly extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MainPage(), // AuthHandler should navigate to /main after login
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData) {
+            return LoginPage();
+          }
+
+          return MainPage();
+        },
+      ),
       routes: {
         '/login': (_) => LoginPage(),
         '/signup': (_) => SignUpPage(),
-        '/main': (_) => MainPage(), // Main page with bottom navigation
-        '/reciple': (_) => RecipeHomePage(),
         '/recipe/search': (_) => SearchPage(),
-        '/recipe/favorite': (_) => FavoritesPage(),
-        '/profile': (_) => ProfilePage(),
       },
     );
   }
@@ -50,38 +59,32 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> _pages = [
     RecipeHomePage(), // Default page: Home
-    FavoritesPage(), // Favorites page
+    RecipesFavoritePage(), // Favorites page
     ProfilePage(), // Profile page
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
 
-      bottomNavigationBar: BottomAppBar(
-        color: const Color.fromARGB(100, 201, 177, 145),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          backgroundColor: const Color.fromARGB(100, 201, 177, 145),
-          selectedItemColor: Colors.orangeAccent,
-          unselectedItemColor: Colors.black54,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              label: 'Favorites',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          ],
-        ),
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Color.fromARGB(255, 201, 177, 145),
+        indicatorColor: Colors.orangeAccent,
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        destinations: [
+          NavigationDestination(icon: Icon(Icons.home), label: "Home"),
+          NavigationDestination(icon: Icon(Icons.bookmark), label: "Favorites"),
+          NavigationDestination(
+            icon: Icon(Icons.account_circle_rounded),
+            label: "Profile",
+          ),
+        ],
       ),
     );
   }

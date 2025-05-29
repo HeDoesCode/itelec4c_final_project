@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:itelec4c_final_project/components/auth_appbar.dart';
 import 'package:itelec4c_final_project/components/recipe_list_item.dart';
 import 'package:itelec4c_final_project/pages/recipe/recipe_details_page.dart';
-import 'package:itelec4c_final_project/components/bottom_appbar.dart'; // Import BottomNavBar
-import 'package:itelec4c_final_project/pages/profile/profile_details_page.dart';
-import 'package:itelec4c_final_project/pages/recipe/recipe_favorite_page.dart';
 
 class RecipeHomePage extends StatefulWidget {
   const RecipeHomePage({super.key});
@@ -16,22 +13,6 @@ class RecipeHomePage extends StatefulWidget {
 }
 
 class _RecipeHomePageState extends State<RecipeHomePage> {
-  int _selectedIndex = 0; // Set the initial page to Home
-
-  // List of Pages to navigate to
-  final List<Widget> _pages = [
-    RecipeHomePage(), // Home Page
-    FavoritesPage(), // Favorites Page
-    ProfilePage(), // Profile Page
-  ];
-
-  // Handle navigation when tapping on a bottom navigation item
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
