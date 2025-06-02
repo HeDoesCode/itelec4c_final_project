@@ -15,7 +15,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   TextEditingController emailController = TextEditingController();
 
   User? currentUser;
-  var user;
 
   @override
   void initState() {
@@ -24,19 +23,18 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   }
 
   Future _getUserDetails() async {
-    var currentUser = FirebaseAuth.instance.currentUser;
+    currentUser = FirebaseAuth.instance.currentUser;
     await currentUser?.reload();
     currentUser = FirebaseAuth.instance.currentUser;
 
-    var user =
-        await FirebaseFirestore.instance
-            .collection('tbl_users')
-            .doc(currentUser!.uid)
-            .get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('tbl_users')
+        .doc(currentUser!.uid)
+        .get();
 
     setState(() {
-      usernameController.text = user['username'];
-      emailController.text = currentUser?.email as String;
+      usernameController.text = userDoc['username'];
+      emailController.text = currentUser?.email ?? '';
     });
   }
 
@@ -48,87 +46,90 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         title: Text("Edit Profile"),
         backgroundColor: Colors.orangeAccent,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               Text(
                 'Edit your profile',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 30),
               Card(
-                elevation: 5,
+                elevation: 6,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24.0,
+                    horizontal: 20.0,
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextFormField(
                         controller: usernameController,
-                        decoration: InputDecoration(labelText: 'Username'),
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
+                          if (value == null || value.trim().isEmpty) {
                             return 'Username is required';
                           }
                           return null;
                         },
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 20),
                       TextFormField(
                         controller: emailController,
-                        decoration: InputDecoration(labelText: 'Email'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Email is required';
-                          }
-                          return null;
-                        },
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Email (read-only)',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                        ),
                       ),
-                      SizedBox(height: 10),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
+              SizedBox(height: 30),
+              ElevatedButton.icon(
                 onPressed: () async {
                   if (_formKey.currentState?.validate() ?? false) {
-                    await currentUser?.verifyBeforeUpdateEmail(
-                      emailController.text.trim(),
-                    );
-
-                    await currentUser?.reload();
-                    currentUser = FirebaseAuth.instance.currentUser;
-
                     await FirebaseFirestore.instance
                         .collection('tbl_users')
                         .doc(currentUser?.uid)
-                        .update({'userrome': usernameController.text.trim()});
+                        .update({'username': usernameController.text.trim()});
 
                     Navigator.pop(context);
                   }
                 },
+                icon: Icon(Icons.save),
+                label: Text('Save Changes'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orangeAccent,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
                   textStyle: TextStyle(fontSize: 16),
                 ),
-                child: Text('Save Changes'),
               ),
             ],
           ),

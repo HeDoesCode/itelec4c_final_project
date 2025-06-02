@@ -24,13 +24,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Future _getUserDetails() async {
     var currentUser = FirebaseAuth.instance.currentUser;
     await currentUser?.reload();
-    currentUser = FirebaseAuth.instance.currentUser;
 
-    var user =
-        await FirebaseFirestore.instance
-            .collection('tbl_users')
-            .doc(currentUser!.uid)
-            .get();
+    var user = await FirebaseFirestore.instance
+        .collection('tbl_users')
+        .doc(currentUser!.uid)
+        .get();
 
     setState(() {
       _username = user['username'];
@@ -47,28 +45,32 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             Text(
               'Hello, $_username!',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             Card(
-              elevation: 5,
+              elevation: 6,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(20),
               ),
               color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24.0,
+                  horizontal: 20.0,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     InfoRow(label: 'Username', value: _username),
+                    Divider(thickness: 1, height: 32, color: Colors.orangeAccent),
                     InfoRow(label: 'Email', value: _email),
                   ],
                 ),
@@ -76,45 +78,57 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Spacer(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
+                _styledButton(
+                  label: 'Edit Profile',
+                  icon: Icons.edit,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProfileUpdatePage(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-                    textStyle: TextStyle(fontSize: 16),
-                  ),
-                  child: Text('Edit Profile'),
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProfileUpdatePage(),
+    ),
+  ).then((_) {
+    // Refresh data after returning from ProfileUpdatePage
+    _getUserDetails();
+  });
+},
+
                 ),
-                ElevatedButton(
+                _styledButton(
+                  label: 'Logout',
+                  icon: Icons.logout,
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-                    textStyle: TextStyle(fontSize: 16),
-                  ),
-                  child: Text('Logout'),
                 ),
               ],
             ),
+            SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _styledButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 20),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.orangeAccent,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        textStyle: TextStyle(fontSize: 16),
       ),
     );
   }
@@ -128,22 +142,33 @@ class InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
+    return Row(
+      children: [
+        Expanded(
+          flex: 4,
+          child: Text(
             '$label:',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          Text(value, style: TextStyle(fontSize: 18, color: Colors.black54)),
-        ],
-      ),
+        ),
+        Expanded(
+          flex: 6,
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black54,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

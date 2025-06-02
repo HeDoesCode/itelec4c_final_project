@@ -55,20 +55,29 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 0;
+ int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    RecipeHomePage(), // Default page: Home
-    RecipesFavoritePage(), // Favorites page
-    ProfilePage(), // Profile page
-  ];
+final List<Widget> _pages = [
+  RecipeHomePage(key: ValueKey('home')),
+  RecipesFavoritePage(key: ValueKey('favorites')),
+  ProfilePage(key: ValueKey('profile')),
+];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-
-      bottomNavigationBar: NavigationBar(
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: AnimatedSwitcher(
+      duration: Duration(milliseconds: 300),
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+      child: _pages[_selectedIndex],
+    ),
+    bottomNavigationBar: AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: NavigationBar(
         backgroundColor: Color.fromARGB(255, 201, 177, 145),
         indicatorColor: Colors.orangeAccent,
         selectedIndex: _selectedIndex,
@@ -77,15 +86,14 @@ class _MainPageState extends State<MainPage> {
             _selectedIndex = index;
           });
         },
-        destinations: [
+        destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: "Home"),
           NavigationDestination(icon: Icon(Icons.bookmark), label: "Favorites"),
-          NavigationDestination(
-            icon: Icon(Icons.account_circle_rounded),
-            label: "Profile",
-          ),
+          NavigationDestination(icon: Icon(Icons.account_circle_rounded), label: "Profile"),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
