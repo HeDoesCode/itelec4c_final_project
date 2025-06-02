@@ -45,6 +45,11 @@ class _RecipeListItemState extends State<RecipeListItem> {
     return ingredients.join(', ');
   }
 
+  String buildImageFilename(String title) {
+    String filename = "${title.replaceAll(" ", "-")}.jpg";
+    return "images/recipes/$filename";
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -69,7 +74,7 @@ class _RecipeListItemState extends State<RecipeListItem> {
               children: [
                 Image(
                   width: 125,
-                  image: AssetImage('images/img_placeholder_square.png'),
+                  image: AssetImage(buildImageFilename(widget.recipe['title'])),
                 ),
                 SizedBox(width: 10),
                 Expanded(

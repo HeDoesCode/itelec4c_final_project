@@ -9,6 +9,11 @@ class RecipeDetailsPage extends StatelessWidget {
 
   const RecipeDetailsPage({super.key, required this.recipe});
 
+  String buildImageFilename(String title) {
+    String filename = "${title.replaceAll(" ", "-")}.jpg";
+    return "images/recipes/$filename";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +27,7 @@ class RecipeDetailsPage extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.all(20),
                 children: [
-                  Image(image: AssetImage('images/img_placeholder_rect.png')),
+                  Image(image: AssetImage(buildImageFilename(recipe['title']))),
                   SizedBox(height: 20),
                   ListBuilder(
                     sectionTitle: "Ingredients",

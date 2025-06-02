@@ -126,6 +126,11 @@ class RecipeFeaturedItem extends StatelessWidget {
 
   const RecipeFeaturedItem({super.key, required this.recipe});
 
+  String buildImageFilename(String title) {
+    String filename = "${title.replaceAll(" ", "-")}.jpg";
+    return "images/recipes/$filename";
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -141,17 +146,22 @@ class RecipeFeaturedItem extends StatelessWidget {
         padding: EdgeInsets.all(10),
         child: Stack(
           children: [
-            Image(image: AssetImage('images/img_placeholder_rect.png')),
+            Image(image: AssetImage(buildImageFilename(recipe['title']))),
             Positioned(
               bottom: 0,
-              left: 5,
-              child: Text(
-                recipe['title'],
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: Color.fromRGBO(0, 0, 0, 0.5),
+                padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                child: Text(
+                  recipe['title'],
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
